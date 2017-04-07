@@ -13,7 +13,7 @@ With this package you can create Basic Day/Night cycle, also it includes a syste
 * Stars.
 * Stars Twinkle.
 
-Moon Texture: http://acxjcr.wixsite.com/acr0/u5-moon-textures
+Moon Texture: http://www.mediafire.com/file/dsubr1ft58sgjcc/Full_Moon_Texture_Free_v1.1.unitypackage
 
 Asset Store: https://www.assetstore.unity3d.com/en/#!/content/71422
 
