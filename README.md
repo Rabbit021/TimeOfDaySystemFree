@@ -1,6 +1,6 @@
 # Time Of Day System Free v1.2.9b
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=726LRHX4QNEQC)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)]()
 
 With this package you can create Basic Day/Night cycle, also it includes a system of curves and gradients to control the parameters of the lighting, sky, moon, stars, fog, etc.
 
@@ -17,6 +17,6 @@ Moon Texture: http://www.mediafire.com/file/dsubr1ft58sgjcc/Full_Moon_Texture_Fr
 
 Asset Store: https://www.assetstore.unity3d.com/en/#!/content/71422
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=726LRHX4QNEQC)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)]()
 
 
