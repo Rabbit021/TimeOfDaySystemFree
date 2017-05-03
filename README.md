@@ -1,4 +1,4 @@
-# Time Of Day System Free v1.2.9b
+# Time Of Day System Free v1.2.9c
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)]()
 
