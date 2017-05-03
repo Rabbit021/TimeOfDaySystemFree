@@ -121,7 +121,7 @@ namespace AC.TimeOfDaySystemFree
 		public bool useHorizonFade = true;
 
 		[SerializeField]
-		[Range(.03f,2f)]private float m_HorizonFade = 1.5f;
+		[Range(0f,0.2f)]private float m_HorizonFade = 0.11f;
 
 		public float HorizonFade
 		{

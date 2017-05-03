@@ -8,23 +8,36 @@ ________________________________________________________________________________
 =======================================-  Current  -======================================= 
 
 -------------------------------------------------------------------------------------------
-v 1.2.9b
+v 1.2.9c
 ===========================================================================================
 
-GitHub: https://github.com/ACFILES/TimeOfDaySystemFree
+GitHub: https://github.com/Akue/TimeOfDaySystemFree
 
 Notice 2: The "Unity-Custom-Procedural-Skybox" shader is property by Unity Technologies.
 -------------------------------------------------------------------------------------------
 
 Notice 3: Not mobile optimized, I only tested in Galaxy Tablet A (38-40FPS).
 
-realistic full moon texture : http://acxjcr.wixsite.com/acr0/u5-moon-textures
+realistic full moon texture : http://www.mediafire.com/file/dsubr1ft58sgjcc/Full_Moon_Texture_Free_v1.1.unitypackage
 
 Notice 4: Due to lack of time I decided not to continue working in the clouds for this asset for now.
 
-* Removed unnecessary code.
+
+* Cleaned moon halo.
+* Cleaned atmosphere night color.
+* Optimized horizon fade.
+
 
 =======================================-    Old    -=======================================
+
+
+-------------------------------------------------------------------------------------------
+v 1.2.9b
+===========================================================================================
+
+
+* Removed unnecessary code.
+
 
 ------------------------------------------------------------------------------------------
 v 1.2.9

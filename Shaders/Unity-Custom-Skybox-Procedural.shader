@@ -232,9 +232,9 @@ SubShader
 		{
 
 			//half3 delta  = vec1 - vec2;
-			float dir    = length(delta) * _MoonHaloSize;
-			float spot   = 1-smoothstep(-3, 1, dir);
-			return  spot * ( _MoonHaloColor.rgb * _MoonHaloIntensity * 3);
+			float dir    = length(delta);
+			float spot   = 1-smoothstep(0, _MoonHaloSize, dir);
+			return  spot * ( _MoonHaloColor.rgb * _MoonHaloIntensity);
 		}
 		//_________________________________________________________________________________________________________________
 
@@ -249,7 +249,7 @@ SubShader
 
 			float4	pos				   : SV_POSITION;
 
-			float3 worldPos            : TEXCOORD0;
+			float4 worldPos            : TEXCOORD0;
 
 			// calculate sky colors in vprog
 			half3	groundColor		   : TEXCOORD1;
@@ -279,10 +279,10 @@ SubShader
 			OUT.pos = UnityObjectToClipPos(v.vertex);
 
 
-			OUT.worldPos = mul((float3x3)unity_ObjectToWorld, v.vertex.xyz);
+			OUT.worldPos.xyz = mul((float3x3)unity_ObjectToWorld, v.vertex.xyz);
 
 			// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-			float3 eyeRay = normalize(OUT.worldPos);
+			float3 eyeRay = normalize(OUT.worldPos.xyz);
 
 
 			// Moon coords.
@@ -335,10 +335,6 @@ SubShader
 
 			float far = 0.0; half3 cIn, cOut; 
 
-			#if defined(ATMOSPHERICNIGHTCOLOR)
-				float3 nColor = float3(0.0, 0.0, 0.0);
-			#endif
-
 
 			if(eyeRay.y >= 0.0)
 			{
@@ -369,59 +365,82 @@ SubShader
 				// Weird workaround: WP8 and desktop FL_9_1 do not like the for loop here
 				// (but an almost identical loop is perfectly fine in the ground calculations below)
 				// Just unrolling this manually seems to make everything fine again.
-//				for(int i=0; i<int(kSamples); i++)
+				//for(int i=0; i<int(kSamples); i++)
 				{
 					float  height      = length(samplePoint);
+
+					float rheight = 1.0 / height; // reciprocal.
+
 					float  depth       = exp(kScaleOverScaleDepth * (kInnerRadius - height));
-					float  lightAngle  = dot(_SunDir.xyz, samplePoint) / height;
-					float  cameraAngle = dot(eyeRay, samplePoint) / height;
-					float  scatter     = (startOffset + depth*(scale(lightAngle) - scale(cameraAngle)));
-					float3 attenuate   = exp(-clamp(scatter, 0.0, kMAX_SCATTER) * (kInvWavelength * kKr4PI + kKm4PI));
+					float  lightAngle  = dot(_SunDir.xyz, samplePoint) *rheight;
+					float  cameraAngle = dot(eyeRay, samplePoint) * rheight;
+
+					float3 atten = (kInvWavelength * kKr4PI + kKm4PI);
+
+					float  scatter     = ( startOffset + depth * (scale(lightAngle) - scale(cameraAngle)) );
+
+					float3 attenuate   = exp(-clamp(scatter, 0.0, kMAX_SCATTER) * atten);
+
+				
+					//________________________________________________________________________________________________
+
+
 
 					frontColor  += (attenuate * (depth * scaledLength));
-					samplePoint += sampleRay;
 
-					// Night color.
-					//------------------------------------------------------------------------------------------------
+
 					#if defined(ATMOSPHERICNIGHTCOLOR)
+
 					float nScatter = (startOffset + depth * (scale(-lightAngle) - scale(cameraAngle)));
-					float nAtten   = exp(-clamp(nScatter, 0.0, kMAX_SCATTER) *  (kInvWavelength * kKr4PI + kKm4PI));
-					nColor        += (nAtten * (depth * scaledLength));
+					float nAtten   = exp(-clamp(nScatter, 0.0, kMAX_SCATTER) * atten);
+
+					frontColor += (nAtten * (depth * scaledLength)) * _NightColor.rgb;
+
 					#endif
-					//________________________________________________________________________________________________
+
+					samplePoint += sampleRay;
 
 				}
 				{
 					float  height      = length(samplePoint);
-					float  depth       = exp(kScaleOverScaleDepth * (kInnerRadius - height));
-					float  lightAngle  = dot(_SunDir.xyz, samplePoint) / height;
-					float  cameraAngle = dot(eyeRay, samplePoint) / height;
-					float  scatter     = (startOffset + depth*(scale(lightAngle) - scale(cameraAngle)));
-					float3 attenuate   = exp(-clamp(scatter, 0.0, kMAX_SCATTER) * (kInvWavelength * kKr4PI + kKm4PI));
 
-					frontColor  += attenuate * (depth * scaledLength);
+					float rheight = 1.0 / height; // reciprocal.
+
+					float  depth       = exp(kScaleOverScaleDepth * (kInnerRadius - height));
+					float  lightAngle  = dot(_SunDir.xyz, samplePoint) *rheight;
+					float  cameraAngle = dot(eyeRay, samplePoint) * rheight;
+
+					float3 atten = (kInvWavelength * kKr4PI + kKm4PI);
+
+					float  scatter     = ( startOffset + depth * (scale(lightAngle) - scale(cameraAngle)) );
+
+					float3 attenuate   = exp(-clamp(scatter, 0.0, kMAX_SCATTER) * atten);
+
+				
+					//________________________________________________________________________________________________
+
+
+
+					frontColor  += (attenuate * (depth * scaledLength));
+
+
+					#if defined(ATMOSPHERICNIGHTCOLOR)
+
+					float nScatter = (startOffset + depth * (scale(-lightAngle) - scale(cameraAngle)));
+					float nAtten   = exp(-clamp(nScatter, 0.0, kMAX_SCATTER) * atten);
+
+					frontColor += (nAtten * (depth * scaledLength)) * _NightColor.rgb;
+
+					#endif
+
 					samplePoint += sampleRay;
 
-					// Night color.
-					//------------------------------------------------------------------------------------------------
-					#if defined(ATMOSPHERICNIGHTCOLOR)
-					float nScatter = (startOffset + depth * (scale(-lightAngle) - scale(cameraAngle)));
-					float nAtten   = exp(-clamp(nScatter, 0.0, kMAX_SCATTER) *  (kInvWavelength * kKr4PI + kKm4PI));
-					nColor        += (nAtten * (depth * scaledLength));
-					#endif
-					//________________________________________________________________________________________________
 				}
+			
 
 				// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
 				cIn  = (frontColor * (kInvWavelength * kKrESun));
 				cOut = frontColor * kKmESun;
-
-				// Night color.
-				//------------------------------------------------------------------------------------------------
-				#if defined(ATMOSPHERICNIGHTCOLOR)
-				cIn += (nColor * _NightColor) * (kInvWavelength * kKrESun) * 0.25;
-				#endif
-				//________________________________________________________________________________________________
 
 			}
 			else
@@ -492,6 +511,9 @@ SubShader
 
 			//_______________________________________________________________________________________________________________________________
 
+
+			OUT.worldPos.w = saturate(HorizonFade(eyeRay.y));
+
 			return OUT;
 		}
 
@@ -507,7 +529,7 @@ SubShader
 			// Horizon fade.
 			//---------------------------------------------------------------------------------------------------------------------------------------
 			#if defined (HORIZONFADE)
-			half horizonFade = saturate(HorizonFade(ray.y/0.1));
+			half horizonFade = IN.worldPos.w;
 			//IN.skyColor     += horizonFade; // debug.
 			#endif
 			//---------------------------------------------------------------------------------------------------------------------------------------

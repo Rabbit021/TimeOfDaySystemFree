@@ -62,7 +62,7 @@ inline float3 StarsNoiseCoords(float3 sunCoords)
 // Horizon fade.
 inline half HorizonFade(float dir)
 {
-	return pow(max(0, dir), _HorizonFade);
+	return 1.0 - (-dir + _HorizonFade) * 10;
 }
 
 
@@ -81,7 +81,7 @@ inline half4 MoonColor(float4 coords)
 
 	// Mask
 	half mask   = (1.0 - color.a);
-	color      *= 1.0 - mask; // for no black backgrouds.
+	//color      *= 1.0 - mask; // for no black backgrouds.
 
 	// moon color = rgb, mask = a.
 	return half4(color.rgb, mask);
